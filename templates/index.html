@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Disease Progression Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Diabetes Disease Progression Prediction</h1>
+            <p class="subtitle">Enter patient data to predict disease progression score</p>
+        </header>
+
+        {% if not model_loaded %}
+        <div class="alert alert-error">
+            <strong>Warning:</strong> Model not loaded. Please run train_model.py first.
+        </div>
+        {% endif %}
+
+        <div class="form-container">
+            <form id="predictionForm" method="POST" action="/predict">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" step="0.01" required 
+                               placeholder="Enter age">
+                        <small>Age of the patient</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sex">Sex</label>
+                        <input type="number" id="sex" name="sex" step="0.01" required 
+                               placeholder="Enter sex (0 or 1)">
+                        <small>Sex of the patient (0 or 1)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bmi">BMI</label>
+                        <input type="number" id="bmi" name="bmi" step="0.01" required 
+                               placeholder="Enter BMI">
+                        <small>Body Mass Index</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bp">Blood Pressure (BP)</label>
+                        <input type="number" id="bp" name="bp" step="0.01" required 
+                               placeholder="Enter blood pressure">
+                        <small>Average blood pressure</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="s1">S1 (TC)</label>
+                        <input type="number" id="s1" name="s1" step="0.01" required 
+                               placeholder="Enter S1 value">
+                        <small>Total cholesterol</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="s2">S2 (LDL)</label>
+                        <input type="number" id="s2" name="s2" step="0.01" required 
+                               placeholder="Enter S2 value">
+                        <small>Low-density lipoproteins</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="s3">S3 (HDL)</label>
+                        <input type="number" id="s3" name="s3" step="0.01" required 
+                               placeholder="Enter S3 value">
+                        <small>High-density lipoproteins</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="s4">S4 (TCH)</label>
+                        <input type="number" id="s4" name="s4" step="0.01" required 
+                               placeholder="Enter S4 value">
+                        <small>Total cholesterol / HDL</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="s5">S5 (LTG)</label>
+                        <input type="number" id="s5" name="s5" step="0.01" required 
+                               placeholder="Enter S5 value">
+                        <small>Log of serum triglycerides level</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="s6">S6 (GLU)</label>
+                        <input type="number" id="s6" name="s6" step="0.01" required 
+                               placeholder="Enter S6 value">
+                        <small>Blood sugar level</small>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        Predict Disease Progression
+                    </button>
+                    <button type="reset" class="btn btn-secondary">Clear Form</button>
+                </div>
+            </form>
+
+            <div id="result" class="result-container" style="display: none;">
+                <div class="result-box">
+                    <h2>Prediction Result</h2>
+                    <div class="prediction-value">
+                        <span class="label">Predicted Diabetes Progression Score:</span>
+                        <span class="value" id="predictionValue">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error" class="alert alert-error" style="display: none;">
+                <strong>Error:</strong> <span id="errorMessage"></span>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with Flask and scikit-learn | Diabetes Dataset</p>
+            <a href="/metrics" class="link">View Model Metrics</a>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Hide previous results/errors
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Predicting...';
+            submitBtn.disabled = true;
+            
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show prediction result
+                    document.getElementById('predictionValue').textContent = data.prediction;
+                    document.getElementById('result').style.display = 'block';
+                    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    // Show error
+                    document.getElementById('errorMessage').textContent = data.error || 'An error occurred';
+                    document.getElementById('error').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Prediction error:', error);
+                document.getElementById('errorMessage').textContent = 'Network error: ' + error.message + '. Make sure the Flask server is running.';
+                document.getElementById('error').style.display = 'block';
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
+
