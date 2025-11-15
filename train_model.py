@@ -12,9 +12,10 @@ import numpy as np
 import pickle
 import os
 
-# Load the diabetes dataset
+# Load the diabetes dataset (raw/unscaled version so users can enter real-world values)
 print("Loading diabetes dataset...")
-diabetes = load_diabetes()
+print("Note: Loading raw (unscaled) data so users can enter real-world values")
+diabetes = load_diabetes(scaled=False)
 X = diabetes.data
 y = diabetes.target
 
