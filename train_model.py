@@ -75,6 +75,27 @@ with open('scaler.pkl', 'wb') as f:
     pickle.dump(scaler, f)
 
 print("Model and scaler saved successfully!")
+
+# Save metrics to JSON file for the web app
+import json
+metrics = {
+    'train': {
+        'mae': round(train_mae, 4),
+        'mse': round(train_mse, 4),
+        'rmse': round(train_rmse, 4),
+        'r2': round(train_r2, 4)
+    },
+    'test': {
+        'mae': round(test_mae, 4),
+        'mse': round(test_mse, 4),
+        'rmse': round(test_rmse, 4),
+        'r2': round(test_r2, 4)
+    }
+}
+with open('metrics.json', 'w') as f:
+    json.dump(metrics, f, indent=2)
+print("Metrics saved to metrics.json")
+
 print("\nYou can now run the Flask app with: python app.py")
 
 

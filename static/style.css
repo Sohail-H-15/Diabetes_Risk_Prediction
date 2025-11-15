@@ -66,20 +66,38 @@ header h1 {
     font-size: 0.95em;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     padding: 12px 15px;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     font-size: 1em;
     transition: all 0.3s ease;
     background: #f9f9f9;
+    font-family: inherit;
+    width: 100%;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: #667eea;
     background: white;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 40px;
+}
+
+.form-group select option {
+    padding: 10px;
+    background: white;
 }
 
 .form-group small {
@@ -172,6 +190,36 @@ header h1 {
     padding: 15px 40px;
     border-radius: 10px;
     margin-top: 10px;
+}
+
+.interpretation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.interpretation-label {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.interpretation-badge {
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1.1em;
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.interpretation-note {
+    margin-top: 15px;
+    opacity: 0.8;
+    font-size: 0.9em;
+    text-align: center;
 }
 
 /* Alert Styles */

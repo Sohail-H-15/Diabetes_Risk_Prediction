@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, jsonify
 import pickle
 import numpy as np
 import os
+import json
 
 app = Flask(__name__)
 
@@ -50,7 +51,17 @@ def predict():
                 missing_fields.append(feature)
             else:
                 try:
-                    input_data.append(float(value))
+                    # Special handling for sex field (convert Male/Female to 0/1)
+                    if feature == 'sex':
+                        if value.lower() == 'male':
+                            input_data.append(1.0)
+                        elif value.lower() == 'female':
+                            input_data.append(0.0)
+                        else:
+                            # Fallback: try to parse as number (for backward compatibility)
+                            input_data.append(float(value))
+                    else:
+                        input_data.append(float(value))
                 except ValueError:
                     return jsonify({
                         'error': f'Invalid value for {feature}. Please enter a valid number.',
@@ -71,9 +82,23 @@ def predict():
         
         # Make prediction
         prediction = model.predict(input_scaled)[0]
+        prediction_rounded = round(prediction, 2)
+        
+        # Interpret prediction (disease progression score interpretation)
+        if prediction_rounded < 100:
+            interpretation = "Low"
+            interpretation_color = "#4CAF50"  # Green
+        elif prediction_rounded < 200:
+            interpretation = "Moderate"
+            interpretation_color = "#FF9800"  # Orange
+        else:
+            interpretation = "High"
+            interpretation_color = "#F44336"  # Red
         
         return jsonify({
-            'prediction': round(prediction, 2),
+            'prediction': prediction_rounded,
+            'interpretation': interpretation,
+            'interpretation_color': interpretation_color,
             'success': True
         })
     
@@ -90,9 +115,15 @@ def predict():
 @app.route('/metrics')
 def metrics():
     """Display model evaluation metrics (bonus feature)."""
-    # This would typically load metrics from a saved file or recalculate
-    # For now, we'll show a placeholder or load from a saved metrics file
-    return render_template('metrics.html', model_loaded=model_loaded)
+    # Load metrics from JSON file if available
+    metrics_data = None
+    try:
+        with open('metrics.json', 'r') as f:
+            metrics_data = json.load(f)
+    except FileNotFoundError:
+        pass
+    
+    return render_template('metrics.html', model_loaded=model_loaded, metrics=metrics_data)
 
 
 if __name__ == '__main__':

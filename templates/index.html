@@ -31,9 +31,12 @@
 
                     <div class="form-group">
                         <label for="sex">Sex</label>
-                        <input type="number" id="sex" name="sex" step="0.01" required 
-                               placeholder="Enter sex (0 or 1)">
-                        <small>Sex of the patient (0 or 1)</small>
+                        <select id="sex" name="sex" required>
+                            <option value="">Select sex</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                        <small>Select the patient's sex</small>
                     </div>
 
                     <div class="form-group">
@@ -108,6 +111,13 @@
                         <span class="label">Predicted Diabetes Progression Score:</span>
                         <span class="value" id="predictionValue">-</span>
                     </div>
+                    <div class="interpretation" id="interpretation" style="display: none;">
+                        <span class="interpretation-label">Risk Level:</span>
+                        <span class="interpretation-badge" id="interpretationBadge"></span>
+                    </div>
+                    <div class="interpretation-note">
+                        <small>Note: This score indicates disease progression. Lower scores suggest better outcomes.</small>
+                    </div>
                 </div>
             </div>
 
@@ -153,6 +163,16 @@
                 if (data.success) {
                     // Show prediction result
                     document.getElementById('predictionValue').textContent = data.prediction;
+                    
+                    // Show interpretation if available
+                    if (data.interpretation) {
+                        const interpretationEl = document.getElementById('interpretation');
+                        const badgeEl = document.getElementById('interpretationBadge');
+                        badgeEl.textContent = data.interpretation;
+                        badgeEl.style.backgroundColor = data.interpretation_color || '#667eea';
+                        interpretationEl.style.display = 'flex';
+                    }
+                    
                     document.getElementById('result').style.display = 'block';
                     document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 } else {

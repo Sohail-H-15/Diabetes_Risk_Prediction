@@ -70,33 +70,59 @@
                 <p><strong>Features:</strong> 10 (age, sex, bmi, bp, s1, s2, s3, s4, s5, s6)</p>
             </div>
 
-            <h2 style="margin-top: 30px; color: #555;">Test Set Performance</h2>
+            {% if metrics %}
+            <h2 style="margin-top: 30px; color: #555;">Training Set Performance</h2>
             <div class="metrics-grid">
                 <div class="metric-card">
                     <h3>Mean Absolute Error (MAE)</h3>
-                    <div class="metric-value">~45.2</div>
+                    <div class="metric-value">{{ metrics.train.mae }}</div>
                     <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">Lower is better</p>
                 </div>
                 <div class="metric-card">
                     <h3>Mean Squared Error (MSE)</h3>
-                    <div class="metric-value">~3100</div>
+                    <div class="metric-value">{{ metrics.train.mse }}</div>
                     <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">Lower is better</p>
                 </div>
                 <div class="metric-card">
                     <h3>Root Mean Squared Error (RMSE)</h3>
-                    <div class="metric-value">~55.7</div>
+                    <div class="metric-value">{{ metrics.train.rmse }}</div>
                     <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">Lower is better</p>
                 </div>
                 <div class="metric-card">
                     <h3>R² Score</h3>
-                    <div class="metric-value">~0.45</div>
+                    <div class="metric-value">{{ metrics.train.r2 }}</div>
                     <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">Higher is better (0-1)</p>
                 </div>
             </div>
 
-            <p style="margin-top: 30px; color: #888; font-style: italic;">
-                Note: These are approximate values. Run train_model.py to see exact metrics.
-            </p>
+            <h2 style="margin-top: 40px; color: #555;">Test Set Performance</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Mean Absolute Error (MAE)</h3>
+                    <div class="metric-value">{{ metrics.test.mae }}</div>
+                    <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">Lower is better</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Mean Squared Error (MSE)</h3>
+                    <div class="metric-value">{{ metrics.test.mse }}</div>
+                    <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">Lower is better</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Root Mean Squared Error (RMSE)</h3>
+                    <div class="metric-value">{{ metrics.test.rmse }}</div>
+                    <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">Lower is better</p>
+                </div>
+                <div class="metric-card">
+                    <h3>R² Score</h3>
+                    <div class="metric-value">{{ metrics.test.r2 }}</div>
+                    <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">Higher is better (0-1)</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-error">
+                <strong>Note:</strong> Metrics not available. Run train_model.py to generate metrics.json
+            </div>
+            {% endif %}
             {% endif %}
 
             <a href="/" class="back-link">← Back to Prediction</a>
